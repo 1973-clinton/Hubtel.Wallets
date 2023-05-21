@@ -21,7 +21,7 @@ namespace Hubtel.Wallets.Api.DataAccess
             builder.Entity<ApplicationUser>(b =>
             {
                 b.ToTable("Users");
-                b.HasMany(a => a.Wallets).WithOne(b => b.ApplicationUser);
+                b.HasMany(a => a.Wallets).WithOne(b => b.ApplicationUser).HasForeignKey(b => b.UserId);
             });
 
             builder.Entity<IdentityUserClaim<string>>(b =>
@@ -52,6 +52,18 @@ namespace Hubtel.Wallets.Api.DataAccess
             builder.Entity<IdentityUserRole<string>>(b =>
             {
                 b.ToTable("UserRoles");
+            });
+
+            builder.Entity<Wallet>(b =>
+            {
+                b.HasIndex(i => i.AccountNumber).IsUnique();
+                b.HasIndex(i => i.Owner);
+                b.Property(p => p.AccountNumber).IsRequired().HasMaxLength(20);
+                b.Property(p => p.AccountScheme).IsRequired();
+                b.Property(p => p.Type).IsRequired().HasMaxLength(4);
+                b.Property(p => p.Name).IsRequired().HasMaxLength(100);
+                b.Property(p => p.Owner).IsRequired().HasMaxLength(13);
+                b.Property(p => p.CreatedAt).IsRequired();
             });
         }
     }
