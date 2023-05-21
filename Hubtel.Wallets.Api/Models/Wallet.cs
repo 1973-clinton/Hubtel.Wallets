@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Hubtel.Wallets.Api.Models
 {
     public class Wallet
     {
+        public Wallet()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
@@ -11,6 +16,7 @@ namespace Hubtel.Wallets.Api.Models
         public string AccountScheme { get; set; }
         public string Owner { get; set; } 
         public DateTime CreatedAt { get; set; }
-
+        public string UserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }
