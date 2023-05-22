@@ -19,7 +19,7 @@ namespace Hubtel.Wallets.Api.Controllers
             _authService = authService;
         }
 
-        [HttpPost("login")]
+        [HttpPost("/login")]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Authenticate([FromBody] AuthRequestDto request)

@@ -2,6 +2,7 @@
 using Hubtel.Wallets.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Reflection.Emit;
@@ -70,14 +71,8 @@ namespace Hubtel.Wallets.Api.DataAccess
                 b.Property(p => p.CreatedAt).IsRequired();
             });
             #endregion
-
-            #region Seeds Admin User and Role
-
-            SeedUsers(builder);
+            
             SeedRoles(builder);
-            SeedUserRoles(builder);
-
-            #endregion
         }
 
         #region Defines private methods
@@ -92,35 +87,6 @@ namespace Hubtel.Wallets.Api.DataAccess
             });
         }
 
-        private void SeedUsers (ModelBuilder builder)
-        {
-            var user = new ApplicationUser
-            {
-                Id = CustomIdentityConstants.UserId,
-                ConcurrencyStamp = Guid.NewGuid().ToString(),
-                Email = CustomIdentityConstants.UserEmail,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                NormalizedEmail = CustomIdentityConstants.UserEmail.ToUpper(),
-                UserName = CustomIdentityConstants.UserEmail,
-                LockoutEnabled = false,
-                PhoneNumber = "0202437997",
-                NormalizedUserName = CustomIdentityConstants.UserEmail.ToUpper()
-            };
-
-            PasswordHasher<ApplicationUser> hasher = new PasswordHasher<ApplicationUser>();
-            user.PasswordHash = hasher.HashPassword(user, CustomIdentityConstants.Password);
-
-            builder.Entity<ApplicationUser>().HasData(user);
-        }
-
-        private void SeedUserRoles(ModelBuilder builder)
-        {
-            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-            {
-                RoleId = CustomIdentityConstants.RoleId,
-                UserId = CustomIdentityConstants.UserId,
-            });
-        }
         #endregion
     }
 }

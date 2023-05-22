@@ -4,6 +4,7 @@ using Hubtel.Wallets.Api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
@@ -22,7 +23,7 @@ namespace Hubtel.Wallets.Api.Controllers
         }
 
         [HttpPost("/wallet")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(WalletDto))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(BaseWalletResponseDto))]
         public async Task<IActionResult> AddWallet([FromBody] WalletDto walletDto)
         {
             var response = await _walletService.AddWalletAsync(walletDto);
@@ -37,7 +38,7 @@ namespace Hubtel.Wallets.Api.Controllers
 
         
         [HttpGet("/wallet/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(WalletDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetWallet(int id)
         {
@@ -52,6 +53,8 @@ namespace Hubtel.Wallets.Api.Controllers
 
         
         [HttpGet("/wallet")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<WalletDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllWallets()
         {
             var response = await _walletService.GetAllWalletAsync();
@@ -64,6 +67,8 @@ namespace Hubtel.Wallets.Api.Controllers
         }
 
         [HttpDelete("/wallet/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BaseWalletResponseDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteWallet(int id)
         {
             var response = await _walletService.RemoveWalletAsync(id);

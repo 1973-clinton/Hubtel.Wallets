@@ -11,6 +11,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using Hubtel.Wallets.Api.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Hubtel.Wallets.Api.Services
 {
@@ -19,10 +20,10 @@ namespace Hubtel.Wallets.Api.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly Jwt _jwt;
 
-        public AuthService(UserManager<ApplicationUser> userManager, Jwt jwt)
+        public AuthService(UserManager<ApplicationUser> userManager, IOptions<Jwt> jwt)
         {
             _userManager = userManager;
-            _jwt = jwt;
+            _jwt = jwt.Value;
         }
         public async Task<AuthResponseDto> GenerateTokenAsync(AuthRequestDto authRequest)
         {
