@@ -4,14 +4,16 @@ using Hubtel.Wallets.Api.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Hubtel.Wallets.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230521235753_RemovedEntityToIdentityRelationship")]
+    partial class RemovedEntityToIdentityRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,16 +90,14 @@ namespace Hubtel.Wallets.Api.Migrations
                         {
                             Id = "36861688-2b78-481e-946b-a1e057c1ed7e",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a2cbfcda-f2d0-4489-93bb-89b664c4b7b9",
+                            ConcurrencyStamp = "9e79aab0-908b-4abd-8f5a-ccdccf2969d1",
                             Email = "admin@hubtel.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@HUBTEL.COM",
-                            NormalizedUserName = "ADMIN@HUBTEL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAENhEbR+3L9l+4VOROJQzzvv+XBfnfpsnVLbhkeuN/ohkSWjGTbq4w/AXLRexeGzFAw==",
                             PhoneNumber = "0202437997",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "633a53e2-3635-45b7-abc9-ed6598a0186e",
+                            SecurityStamp = "48cd3605-7ae3-451a-b7be-3c369898ed90",
                             TwoFactorEnabled = false,
                             UserName = "admin@hubtel.com"
                         });
@@ -177,7 +177,7 @@ namespace Hubtel.Wallets.Api.Migrations
                         new
                         {
                             Id = "c64fc8ed-fc76-4881-a832-6e5fb5100c21",
-                            ConcurrencyStamp = "f52d353f-697a-4941-b268-b688c9cd6787",
+                            ConcurrencyStamp = "9fb9f4dc-d97f-4296-a96f-5057991ed370",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         });

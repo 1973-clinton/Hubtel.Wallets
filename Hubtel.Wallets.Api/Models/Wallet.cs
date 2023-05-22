@@ -14,9 +14,7 @@ namespace Hubtel.Wallets.Api.Models
         public string Type { get; set; }
         public string AccountNumber { get; set; }
         public string AccountScheme { get; set; }
-        public string Owner { get; set; } 
+        public string Owner { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string UserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
     }
 }

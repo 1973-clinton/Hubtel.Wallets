@@ -6,6 +6,5 @@ namespace Hubtel.Wallets.Api.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public ICollection<Wallet> Wallets { get; set; }
     }
 }

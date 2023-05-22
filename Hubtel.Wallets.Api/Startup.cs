@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,14 @@ namespace Hubtel.Wallets.Api
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+            });
             services.AddControllers();
         }
 
