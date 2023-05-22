@@ -108,7 +108,7 @@ namespace Hubtel.Wallets.Api.DataAccess
             };
 
             PasswordHasher<ApplicationUser> hasher = new PasswordHasher<ApplicationUser>();
-            user.PasswordHash = hasher.HashPassword(user, "@dm!nA5");
+            user.PasswordHash = hasher.HashPassword(user, CustomIdentityConstants.Password);
 
             builder.Entity<ApplicationUser>().HasData(user);
         }
