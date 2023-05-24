@@ -1,4 +1,5 @@
-﻿using Hubtel.Wallets.Api.Constants;
+﻿using EntityFramework.Exceptions.SqlServer;
+using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -17,6 +18,12 @@ namespace Hubtel.Wallets.Api.DataAccess
 
         public DbSet<Wallet> Wallets { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+
+            optionsBuilder.UseExceptionProcessor();
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

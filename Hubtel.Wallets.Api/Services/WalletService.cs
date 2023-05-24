@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using EntityFramework.Exceptions.Common;
 using FluentValidation;
+using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.DataAccess;
 using Hubtel.Wallets.Api.Dtos;
 using Hubtel.Wallets.Api.Interfaces;
@@ -29,37 +31,75 @@ namespace Hubtel.Wallets.Api.Services
 
         public async Task<BaseWalletResponseDto> AddWalletAsync(WalletDto walletDto)
         {
-            
-            var response = new BaseWalletResponseDto();
-
-            var validationResults = _validator.Validate(walletDto);
-            if (!validationResults.IsValid)
+            try
             {
-                response.Success = false;
-                response.Message = "One or more validations failed";
-                response.Errors = validationResults.Errors.Select(p => p.ErrorMessage).ToList();
+                var response = new BaseWalletResponseDto();
+
+                if (walletDto.Type == WalletTypeConstants.Card)
+                {
+                    var cardAccountNumberExists = await _context.Wallets.AnyAsync(p => p.AccountNumber == ExtractFirstSixCardDigits(walletDto.AccountNumber));
+                    if (cardAccountNumberExists)
+                    {
+                        response.Success = false;
+                        response.Message = $"The card wallet account {walletDto.AccountNumber} already exists.";
+
+                        return response;
+                    }
+                }
+                else if (walletDto.Type == WalletTypeConstants.Momo)
+                {
+                    var momoAccountNumberExists = await _context.Wallets.AnyAsync(p => p.AccountNumber == walletDto.AccountNumber);
+                    if (momoAccountNumberExists)
+                    {
+                        response.Success = false;
+                        response.Message = $"The momo wallet account {walletDto.AccountNumber} already exists.";
+
+                        return response;
+                    }
+                }
+
+                var validationResults = _validator.Validate(walletDto);
+                if (!validationResults.IsValid)
+                {
+                    response.Success = false;
+                    response.Message = "One or more validations failed";
+                    response.Errors = validationResults.Errors.Select(p => p.ErrorMessage).ToList();
+
+                    return response;
+                }
+
+                var walletLimitExceeded = await _context.Wallets.CountAsync(p => p.Owner == walletDto.Owner) == _walletLimit;
+                if (walletLimitExceeded)
+                {
+                    response.Success = false;
+                    response.Message = $"A customer cannot have more than {_walletLimit} wallets";
+
+                    return response;
+                }                
+
+                if (walletDto.Type == WalletTypeConstants.Card)
+                {
+                    walletDto.AccountNumber = ExtractFirstSixCardDigits(walletDto.AccountNumber);
+                }
+
+                var wallet = _mapper.Map<Wallet>(walletDto);
+                _context.Add(wallet);
+                await _context.SaveChangesAsync();
+
+                response.Id = wallet.Id;
+                response.Success = true;
+                response.Message = "Wallet was added successfully";
 
                 return response;
             }
-
-            
-            if(_context.Wallets.Count(p => p.Owner == walletDto.Owner) == _walletLimit)
+            catch (UniqueConstraintException ex)
             {
-                response.Success = false;
-                response.Message = $"A customer cannot have more than {_walletLimit} wallets";
-
-                return response;
+                return new BaseWalletResponseDto()
+                {
+                    Success = false,
+                    Message = $"Wallet with account number: {walletDto.AccountNumber}, already exists. " + ex.Message
+                };
             }
-
-            var wallet = _mapper.Map<Wallet>(walletDto);
-            _context.Add(wallet);
-            await _context.SaveChangesAsync();
-
-            response.Id = wallet.Id;
-            response.Success = true;
-            response.Message = "Wallet was added successfully";
-
-            return response;
         }
 
         public async Task<IReadOnlyList<WalletDto>> GetAllWalletAsync()
@@ -105,6 +145,11 @@ namespace Hubtel.Wallets.Api.Services
             response.Message = "Wallet removed successfully";
 
             return response;
+        }
+
+        private string ExtractFirstSixCardDigits(string cardNumber)
+        {
+            return cardNumber.Replace(" ", "")[..6];
         }
     }
 }
