@@ -30,18 +30,20 @@ namespace Hubtel.Wallets.Api.Validations
 
             RuleFor(wallet => wallet.Owner).NotEmpty().MaximumLength(10).Matches(ValidationConstants.MustBeNumericOnly);
 
-            RuleFor(wallet => wallet.AccountScheme).NotEmpty().Must(p => accountSchemes.Contains(p));
+            RuleFor(wallet => wallet.AccountScheme).NotEmpty().Must(scheme => accountSchemes.Contains(scheme));
 
-            RuleFor(wallet => wallet.Type).NotEmpty().MaximumLength(4).Must(p => walletTypes.Contains(p));
+            RuleFor(wallet => wallet.Type).NotEmpty().MaximumLength(4).Must(walletType => walletTypes.Contains(walletType));
             
-            // validates account number if it starts with phone number code '0', else it validates it as credit card
-            When(wallet => wallet.AccountNumber.StartsWith("0"), () =>
+            // validates account number if its of 'momo' type, else it validates it as credit card
+            When(wallet => wallet.Type == WalletTypeConstants.Momo, () =>
             {
-                RuleFor(wallet => wallet.AccountNumber).NotEmpty().MaximumLength(10).Matches(ValidationConstants.MustBeNumericOnly);               
+                // validating using only the first digit (0) causes data integrity issue. In this case its best to use the acctNo type and first digit (0)
+                RuleFor(wallet => wallet.AccountNumber).NotEmpty().MaximumLength(10).Matches(ValidationConstants.MustBeNumericOnly).Must(p => p.StartsWith("0")).WithMessage("Account type does not corrrespond with account number. Momo account number must start with '0'");             
             })
             .Otherwise(() =>
             {
                 RuleFor(wallet => wallet.AccountNumber).NotEmpty().CreditCard().Matches(ValidationConstants.MustBeNumericOnly);
+                RuleFor(wallet => wallet.AccountScheme).NotEmpty().Must(scheme => accountSchemes.Contains(scheme));
             });
 
         }
