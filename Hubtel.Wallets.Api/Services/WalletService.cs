@@ -68,6 +68,7 @@ namespace Hubtel.Wallets.Api.Services
                     return response;
                 }
 
+
                 var walletLimitExceeded = await _context.Wallets.CountAsync(p => p.Owner == walletDto.Owner) == _walletLimit;
                 if (walletLimitExceeded)
                 {
