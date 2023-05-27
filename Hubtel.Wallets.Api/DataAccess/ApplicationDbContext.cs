@@ -3,10 +3,8 @@ using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Reflection.Emit;
 
 namespace Hubtel.Wallets.Api.DataAccess
 {
@@ -70,7 +68,7 @@ namespace Hubtel.Wallets.Api.DataAccess
                 b.HasIndex(p => p.AccountNumber).IsUnique();
                 b.HasIndex(p => p.Owner);
                 b.HasKey(p => p.Id);
-                b.Property(p => p.AccountNumber).IsRequired().HasMaxLength(20);
+                b.Property(p => p.AccountNumber).IsRequired();
                 b.Property(p => p.AccountScheme).IsRequired();
                 b.Property(p => p.Type).IsRequired().HasMaxLength(4);
                 b.Property(p => p.Name).IsRequired().HasMaxLength(100);

@@ -2,7 +2,6 @@
 using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.Dtos;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Hubtel.Wallets.Api.Validations
 {

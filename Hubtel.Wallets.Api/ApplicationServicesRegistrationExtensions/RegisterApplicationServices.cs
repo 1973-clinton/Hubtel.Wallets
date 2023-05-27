@@ -16,6 +16,7 @@ using Hubtel.Wallets.Api.Dtos;
 using Hubtel.Wallets.Api.Interfaces;
 using Hubtel.Wallets.Api.Services;
 using Hubtel.Wallets.Api.Validations;
+using Hubtel.Wallets.Api.Helpers;
 
 namespace Hubtel.Wallets.Api.ApplicationServicesRegistrationExtensions
 {
@@ -120,9 +121,11 @@ namespace Hubtel.Wallets.Api.ApplicationServicesRegistrationExtensions
 
         public static IServiceCollection ConfigureApplicationDomainModelServices(this IServiceCollection services)
         {
+            //services.Configure<PurposeString>(configuration.GetSection("PurposeString"));
             services.AddScoped<IValidator<WalletDto>, WalletValidator>();
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IWalletSecurity, WalletSecurity>();
 
             return services;
         }

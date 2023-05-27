@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using EntityFramework.Exceptions.Common;
 using FluentValidation;
 using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.DataAccess;
@@ -7,8 +6,8 @@ using Hubtel.Wallets.Api.Dtos;
 using Hubtel.Wallets.Api.Interfaces;
 using Hubtel.Wallets.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,12 +18,14 @@ namespace Hubtel.Wallets.Api.Services
         private readonly ApplicationDbContext _context;
         private readonly IValidator<WalletDto> _validator;
         private readonly IMapper _mapper;
+        private readonly IWalletSecurity _walletSecurity;
 
-        public WalletService(ApplicationDbContext context, IValidator<WalletDto> validator, IMapper mapper)
+        public WalletService(ApplicationDbContext context, IValidator<WalletDto> validator, IMapper mapper, IWalletSecurity walletSecurity)
         {
             _context = context;
             _validator = validator;
             _mapper = mapper;
+            _walletSecurity = walletSecurity;
         }
 
         private const int _walletLimit = 5;
@@ -37,7 +38,7 @@ namespace Hubtel.Wallets.Api.Services
 
                 if (walletDto.Type == WalletTypeConstants.Card)
                 {
-                    var cardAccountNumberExists = await _context.Wallets.AnyAsync(p => p.AccountNumber == ExtractFirstSixCardDigits(walletDto.AccountNumber));
+                    var cardAccountNumberExists = await _context.Wallets.AnyAsync(p => p.AccountNumber == _walletSecurity.Encrypt(walletDto.AccountNumber));
                     if (cardAccountNumberExists)
                     {
                         response.Success = false;
@@ -80,7 +81,7 @@ namespace Hubtel.Wallets.Api.Services
 
                 if (walletDto.Type == WalletTypeConstants.Card)
                 {
-                    walletDto.AccountNumber = ExtractFirstSixCardDigits(walletDto.AccountNumber);
+                    walletDto.AccountNumber = _walletSecurity.Encrypt(walletDto.AccountNumber);
                 }
 
                 var wallet = _mapper.Map<Wallet>(walletDto);
@@ -93,26 +94,29 @@ namespace Hubtel.Wallets.Api.Services
 
                 return response;
             }
-            catch (UniqueConstraintException ex)
+            catch (Exception ex)
             {
                 return new BaseWalletResponseDto()
                 {
                     Success = false,
-                    Message = $"Wallet with account number: {walletDto.AccountNumber}, already exists. " + ex.Message
+                    Message = ex.Message
                 };
             }
         }
 
         public async Task<IReadOnlyList<WalletDto>> GetAllWalletAsync()
         {
-            var wallets = await _context.Wallets.AsNoTracking().ToListAsync();
-            if (wallets is null)
+            var walletsFromDatabase = await _context.Wallets.AsNoTracking().ToListAsync();
+            if (walletsFromDatabase is null)
             {
                 return null;
             }
-            var response = _mapper.Map<IReadOnlyList<WalletDto>>(wallets);
-
-            return response;
+            var wallets = _mapper.Map<IReadOnlyList<WalletDto>>(walletsFromDatabase);
+            foreach (var wallet in wallets)
+            {
+                wallet.AccountNumber = _walletSecurity.Decrypt(wallet.AccountNumber);
+            }
+            return wallets;
         }
 
         public async Task<WalletDto> GetWalletAsync(int walletId)
@@ -124,7 +128,7 @@ namespace Hubtel.Wallets.Api.Services
             }
 
             var walletDto = _mapper.Map<WalletDto>(wallet);
-
+            walletDto.AccountNumber = _walletSecurity.Decrypt(walletDto.AccountNumber);
             return walletDto;
         }
 
@@ -148,9 +152,5 @@ namespace Hubtel.Wallets.Api.Services
             return response;
         }
 
-        private string ExtractFirstSixCardDigits(string cardNumber)
-        {
-            return cardNumber.Replace(" ", "")[..6];
-        }
     }
 }
