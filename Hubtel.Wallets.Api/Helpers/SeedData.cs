@@ -1,7 +1,6 @@
 ﻿using Hubtel.Wallets.Api.Constants;
 using Hubtel.Wallets.Api.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
 
 namespace Hubtel.Wallets.Api.Helpers
 {

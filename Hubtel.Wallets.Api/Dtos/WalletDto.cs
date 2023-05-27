@@ -1,7 +1,4 @@
-﻿using FluentValidation.Results;
-using System.Collections.Generic;
-
-namespace Hubtel.Wallets.Api.Dtos
+﻿namespace Hubtel.Wallets.Api.Dtos
 {
     public class WalletDto
     {

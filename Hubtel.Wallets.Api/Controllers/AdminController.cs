@@ -39,13 +39,13 @@ namespace Hubtel.Wallets.Api.Controllers
         
         [HttpGet("/wallet/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(WalletDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseWalletResponseDto))]
         public async Task<IActionResult> GetWallet(int id)
         {
             var response = await _walletService.GetWalletAsync(id);
             if (response is null)
             {
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status404NotFound, new BaseWalletResponseDto { Success = false, Message = "Wallet not found" });
             }
 
             return StatusCode(StatusCodes.Status200OK, response);
